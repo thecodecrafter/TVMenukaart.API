@@ -1,0 +1,6 @@
+@RemoteMenu_HostAddress = http://localhost:7253
+
+GET {{RemoteMenu_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
