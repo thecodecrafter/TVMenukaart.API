@@ -1,0 +1,11 @@
+﻿services:
+  tvmenukaart.core.sql:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: tvmenukaart.core.sql
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "Password@1"
+    platform: "linux/amd64/v8"
+    ports:
+      - "1433:1433"
+
