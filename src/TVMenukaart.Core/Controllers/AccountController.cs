@@ -26,7 +26,7 @@ namespace TVMenukaart.Controllers
         {
             if (await UserExists(registerDto.Username))
             {
-                return BadRequest("Gebruikersnaam is al in gebruik");
+                return Conflict("Gebruikersnaam is al in gebruik");
             }
 
             var user = new AppUser
@@ -81,7 +81,7 @@ namespace TVMenukaart.Controllers
         {
             var refreshToken = Request.Cookies["refreshToken"];
             var user = await _userManager.Users.Include(r => r.RefreshTokens)
-                .FirstOrDefaultAsync(x => x.UserName == User.FindFirstValue(ClaimTypes.NameIdentifier));
+                .FirstOrDefaultAsync(x => x.UserName == User.FindFirstValue(ClaimTypes.Name));
 
             if (user == null)
             {

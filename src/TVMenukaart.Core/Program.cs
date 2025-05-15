@@ -1,3 +1,4 @@
+using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -10,6 +11,8 @@ using TVMenukaart.Hubs;
 using TVMenukaart.Interfaces;
 using TVMenukaart.Models;
 using TVMenukaart.Services;
+
+JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddProblemDetails();
@@ -59,8 +62,28 @@ app.UseStatusCodePages();
 
 app.UseRouting();
 app.UseCors();
+app.Use(async (context, next) =>
+{
+    Console.WriteLine($"[Before Auth] {context.Request.Path} => Authenticated: {context.User?.Identity?.IsAuthenticated}");
+    await next();
+});
+
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.Use(async (context, next) =>
+{
+    Console.WriteLine("Auth Header: " + context.Request.Headers["Authorization"]);
+    Console.WriteLine($"[After Auth] {context.Request.Path} => Authenticated: {context.User?.Identity?.IsAuthenticated}");
+    Console.WriteLine($"Name: {context.User?.Identity?.Name}");
+    foreach (var claim in context.User.Claims)
+    {
+        Console.WriteLine($"Claim: {claim.Type} = {claim.Value}");
+    }
+
+    await next();
+});
+
 app.UseHttpsRedirection();
 app.MapControllers();
 
@@ -83,3 +106,5 @@ catch (Exception ex)
 app.MapHub<RemoteMenuHub>("menuHub");
 
 app.Run();
+
+public partial class Program;

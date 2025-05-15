@@ -21,10 +21,18 @@ namespace TVMenukaart.Services
         {
             var claims = new List<Claim>
             {
-                new(JwtRegisteredClaimNames.NameId, appUser.Id.ToString()),
+                new(ClaimTypes.NameIdentifier, appUser.Id.ToString()),
                 new(ClaimTypes.Name, appUser.UserName),
                 new(ClaimTypes.Email, appUser.Email)
             };
+
+            // var claims = new List<Claim>
+            // {
+            //     new(JwtRegisteredClaimNames.NameId, appUser.Id.ToString()),
+            //     new(JwtRegisteredClaimNames.UniqueName, appUser.UserName),
+            //     new(JwtRegisteredClaimNames.Email, appUser.Email),
+            //     new(JwtRegisteredClaimNames.Name, appUser.UserName)
+            // };
 
             var creds = new SigningCredentials(_key, SecurityAlgorithms.HmacSha512Signature);
 
