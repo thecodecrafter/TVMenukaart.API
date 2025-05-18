@@ -22,6 +22,7 @@ namespace TVMenukaart.Controllers
         }
 
         [HttpPost("register")] // POST: api/account/register
+        [ProducesResponseType(typeof(UserDto), (int)HttpStatusCode.OK)]
         public async Task<ActionResult<UserDto>> Register(RegisterDto registerDto)
         {
             if (await UserExists(registerDto.Username))
@@ -34,8 +35,6 @@ namespace TVMenukaart.Controllers
                 UserName = registerDto.Username.ToLower(),
                 Email = registerDto.Username.ToLower()
             };
-
-            user.UserName = registerDto.Username.ToLower();
 
             var result = await _userManager.CreateAsync(user, registerDto.Password);
             if (!result.Succeeded)
@@ -60,7 +59,6 @@ namespace TVMenukaart.Controllers
             {
                 return Problem(type: "Not Found", title: "User not found",
                     statusCode: StatusCodes.Status404NotFound);
-                // return Unauthorized("Gebruikersnaam is ongeldig");
             }
 
             var result = await _userManager.CheckPasswordAsync(user, loginDto.Password);
@@ -77,6 +75,7 @@ namespace TVMenukaart.Controllers
 
         [Authorize]
         [HttpPost("refreshToken")]
+        [ProducesResponseType(typeof(UserDto), (int)HttpStatusCode.OK)]
         public async Task<ActionResult<UserDto>> RefreshToken()
         {
             var refreshToken = Request.Cookies["refreshToken"];

@@ -55,6 +55,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
     app.UseDeveloperExceptionPage();
+    app.ApplyMigrations();
 }
 
 app.UseExceptionHandler();
@@ -62,46 +63,12 @@ app.UseStatusCodePages();
 
 app.UseRouting();
 app.UseCors();
-app.Use(async (context, next) =>
-{
-    Console.WriteLine($"[Before Auth] {context.Request.Path} => Authenticated: {context.User?.Identity?.IsAuthenticated}");
-    await next();
-});
 
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.Use(async (context, next) =>
-{
-    Console.WriteLine("Auth Header: " + context.Request.Headers["Authorization"]);
-    Console.WriteLine($"[After Auth] {context.Request.Path} => Authenticated: {context.User?.Identity?.IsAuthenticated}");
-    Console.WriteLine($"Name: {context.User?.Identity?.Name}");
-    foreach (var claim in context.User.Claims)
-    {
-        Console.WriteLine($"Claim: {claim.Type} = {claim.Value}");
-    }
-
-    await next();
-});
-
 app.UseHttpsRedirection();
 app.MapControllers();
-
-using var scope = app.Services.CreateScope();
-var services = scope.ServiceProvider;
-try
-{
-    var context = services.GetRequiredService<TVMenukaartContext>();
-    var userManager = services.GetRequiredService<UserManager<AppUser>>();
-    await context.Database.MigrateAsync();
-    await Seed.SeedUsers(userManager);
-    await Seed.SeedRestaurants(context);
-}
-catch (Exception ex)
-{
-    var logger = services.GetRequiredService<ILogger<Program>>();
-    logger.LogError(ex, "An error occurred while migrating the database.");
-}
 
 app.MapHub<RemoteMenuHub>("menuHub");
 

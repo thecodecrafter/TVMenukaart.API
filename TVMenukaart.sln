@@ -10,7 +10,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		compose.yaml = compose.yaml
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TVMenukaart.UnitTests", "TVMenukaart.UnitTests\TVMenukaart.UnitTests.csproj", "{48002A76-A942-4127-81C8-9A5167CE83B5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TVMenukaart.IntegrationTests", "TVMenukaart.IntegrationTests\TVMenukaart.IntegrationTests.csproj", "{48002A76-A942-4127-81C8-9A5167CE83B5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
