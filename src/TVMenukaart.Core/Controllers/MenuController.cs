@@ -167,7 +167,7 @@ namespace TVMenukaart.Controllers
         }
 
         [HttpPost("{id}/board-photo")]
-        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [ProducesResponseType((int)HttpStatusCode.OK)]
         public async Task<ActionResult<BoardPhoto>> PostMenuBoardPhoto(int id, IFormFile file)
         {
             // get the menu
@@ -194,13 +194,9 @@ namespace TVMenukaart.Controllers
 
             menu.BoardPhoto = boardPhoto;
 
-            if (await _context.SaveChangesAsync() > 0)
-            {
-                await _hubContext.Clients.All.SendAsync("ReceiveMenuUpdate");
-                return boardPhoto;
-            }
-
-            return NoContent();
+            await _context.SaveChangesAsync();
+            await _hubContext.Clients.All.SendAsync("ReceiveMenuUpdate");
+            return Ok(boardPhoto);
         }
     }
 }

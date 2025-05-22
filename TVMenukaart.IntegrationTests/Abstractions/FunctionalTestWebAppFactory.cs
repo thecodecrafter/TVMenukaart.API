@@ -1,11 +1,15 @@
+using CloudinaryDotNet.Actions;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Moq;
 using Testcontainers.MsSql;
 using TVMenukaart.Data;
+using TVMenukaart.Interfaces;
 using Xunit;
 
 namespace TVMenukaart.IntegrationTests.Abstractions
@@ -28,6 +32,35 @@ namespace TVMenukaart.IntegrationTests.Abstractions
 
                 services.AddDbContext<TVMenukaartContext>(options =>
                     options.UseSqlServer(_dbContainer.GetConnectionString()));
+            });
+
+            builder.ConfigureServices(services =>
+            {
+                // Remove original service
+                var descriptor = services.SingleOrDefault(d => d.ServiceType == typeof(IBackgroundService));
+                if (descriptor != null)
+                {
+                    services.Remove(descriptor);
+                }
+
+                // Add mock
+                var mock = new Mock<IBackgroundService>();
+                mock.Setup(b => b.AddPhotoAsync(It.Is<IFormFile>(f => f.FileName.Equals("fail.jpeg"))))
+                    .ReturnsAsync(new ImageUploadResult
+                    {
+                        Error = new Error
+                        {
+                            Message = "Error in background image service"
+                        }
+                    });
+
+                mock.Setup(b => b.AddPhotoAsync(It.Is<IFormFile>(f => f.FileName.Equals("success.jpeg"))))
+                    .ReturnsAsync(new ImageUploadResult
+                    {
+                        PublicId = "success",
+                        SecureUrl = new Uri("https://www.thecodecrafter.nl")
+                    });
+                services.AddSingleton(mock.Object);
             });
         }
 
