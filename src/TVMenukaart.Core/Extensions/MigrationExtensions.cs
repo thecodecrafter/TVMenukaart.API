@@ -12,12 +12,6 @@ namespace TVMenukaart.Extensions
             var dbContext = scope.ServiceProvider.GetRequiredService<TVMenukaartContext>();
             
             await dbContext.Database.MigrateAsync();
-            // var userManager = services.GetRequiredService<UserManager<AppUser>>();
-            
-            
-                
-            // await Seed.SeedUsers(userManager);
-            // await Seed.SeedRestaurants(dbContext);
         }
     }
 }

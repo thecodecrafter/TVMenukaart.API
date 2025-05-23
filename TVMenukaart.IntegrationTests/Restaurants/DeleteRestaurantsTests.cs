@@ -1,6 +1,7 @@
 using System.Net;
 using FluentAssertions;
 using TVMenukaart.IntegrationTests.Abstractions;
+using TVMenukaart.Models;
 using Xunit;
 
 namespace TVMenukaart.IntegrationTests.Restaurants
@@ -28,8 +29,16 @@ namespace TVMenukaart.IntegrationTests.Restaurants
         public async Task Should_ReturnNoContent_WhenRestaurantIsDeleted()
         {
             // Arrange
+            var appUser = DataSeeder.GetTestUser();
             var client = await CreateClientWithAuth();
-            var restaurant = DataSeeder.GetTestRestaurant();
+            var restaurant = new Restaurant()
+            {
+                Name = "TestRestaurant",
+                AppUser = appUser
+            };
+            
+            DbContext.Restaurants.Add(restaurant);
+            await DbContext.SaveChangesAsync();
 
             // Act
             var response = await client.DeleteAsync($"api/restaurant/{restaurant.Id}");
