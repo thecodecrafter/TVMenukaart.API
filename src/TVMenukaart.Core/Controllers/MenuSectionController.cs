@@ -45,23 +45,6 @@ namespace TVMenukaart.Controllers
             return Ok(menu.MenuSections);
         }
 
-        // [HttpGet("{uid}")]
-        // [AllowAnonymous]
-        // public async Task<ActionResult<IEnumerable<MenuSectionDto>>> GetMenuSectionsByUid(string uid)
-        // {
-        //     var menu = await _context.Menus
-        //         .Include(m => m.MenuSections)
-        //         .ThenInclude(m => m.MenuItems)
-        //         .FirstOrDefaultAsync(i => i.PublicUrl == uid);
-        //
-        //     if (menu == null)
-        //     {
-        //         return NotFound();
-        //     }
-        //
-        //     return Ok(menu.MenuSections);
-        // }
-
         [HttpPost]
         [ProducesResponseType(typeof(MenuSectionDto), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> PostMenuSection(int menuId, string sectionName)
@@ -95,14 +78,14 @@ namespace TVMenukaart.Controllers
 
             if (menu == null)
             {
-                return NotFound();
+                return NotFound("Menu not found.");
             }
 
             var menuSection = menu.MenuSections.FirstOrDefault(i => i.Id == menuSectionId);
 
             if (menuSection == null)
             {
-                return BadRequest();
+                return NotFound("MenuSection not found");
             }
 
             menuSection.Name = sectionName;
@@ -131,11 +114,6 @@ namespace TVMenukaart.Controllers
             await _hubContext.Clients.All.SendAsync("ReceiveMenuUpdate");
 
             return NoContent();
-        }
-
-        private bool MenuItemExists(int id)
-        {
-            return _context.MenuItems.Any(e => e.Id == id);
         }
     }
 }

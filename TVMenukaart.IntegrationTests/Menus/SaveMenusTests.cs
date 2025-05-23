@@ -3,16 +3,17 @@ using System.Net.Http.Json;
 using FluentAssertions;
 using TVMenukaart.DTO;
 using TVMenukaart.IntegrationTests.Abstractions;
+using TVMenukaart.Models;
 using Xunit;
 
-namespace TVMenukaart.IntegrationTests.Menu
+namespace TVMenukaart.IntegrationTests.Menus
 {
     public class SaveMenusTests : BaseFunctionalTest
     {
         public SaveMenusTests(FunctionalTestWebAppFactory factory) : base(factory)
         {
         }
-        
+
         [Fact]
         public async Task Should_ReturnOK_WhenMenuIsCreated()
         {
@@ -20,29 +21,31 @@ namespace TVMenukaart.IntegrationTests.Menu
             var appUser = DataSeeder.GetTestUser();
             var client = await CreateClientWithAuth(appUser.UserName);
             var restaurant = DataSeeder.GetTestRestaurantByUser(appUser.Id);
-            
+
+            while (restaurant == null) restaurant = DataSeeder.GetTestRestaurantByUser(appUser.Id);
+
             // Act
-            var response = await client.PostAsJsonAsync($"api/menu?name=testMenu&restaurantId={restaurant.Id}", new {});
+            var response = await client.PostAsJsonAsync($"api/menu?name=testMenu&restaurantId={restaurant.Id}", new { });
             var result = await response.Content.ReadFromJsonAsync<MenuDto>();
-            
+
             // Assert
             response.StatusCode.Should().Be(HttpStatusCode.OK);
         }
-        
+
         [Fact]
         public async Task Should_ReturnNotFound_WhenRestaurantIsNotFound()
         {
             // Arrange
             var appUser = DataSeeder.GetTestUser();
             var client = await CreateClientWithAuth(appUser.UserName);
-            
+
             // Act
-            var response = await client.PostAsJsonAsync($"api/menu?name=testMenu&restaurantId=9876", new {});
-            
+            var response = await client.PostAsJsonAsync($"api/menu?name=testMenu&restaurantId=9876", new { });
+
             // Assert
             response.StatusCode.Should().Be(HttpStatusCode.NotFound);
         }
-        
+
         [Fact]
         public async Task Should_ReturnUnauthorized_WhenUserIsNotOwnerOfRestaurant()
         {
@@ -52,9 +55,19 @@ namespace TVMenukaart.IntegrationTests.Menu
             var client = await CreateClientWithAuth(appUser2.UserName);
             var restaurant = DataSeeder.GetTestRestaurantByUser(appUser.Id);
             
+            if (restaurant == null)
+            {
+                restaurant = new Restaurant()
+                {
+                    Name = "TestRestaurant"
+                };
+                appUser.Restaurants.Add(restaurant);
+                await DbContext.SaveChangesAsync();
+            }
+
             // Act
-            var response = await client.PostAsJsonAsync($"api/menu?name=testMenu&restaurantId={restaurant.Id}", new {});
-            
+            var response = await client.PostAsJsonAsync($"api/menu?name=testMenu&restaurantId={restaurant.Id}", new { });
+
             // Assert
             response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
         }

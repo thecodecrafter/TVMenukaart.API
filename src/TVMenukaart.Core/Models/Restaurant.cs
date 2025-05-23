@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace TVMenukaart.Models
 {
     public class Restaurant
@@ -7,6 +9,7 @@ namespace TVMenukaart.Models
         public string Phone { get; set; }
         public string Address { get; set; }
         public int AppUserId { get; set; }
+        [JsonIgnore]
         public AppUser AppUser { get; set; } = null!;
         public ICollection<Menu> Menus { get; set; } = [];
     }

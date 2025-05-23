@@ -1,4 +1,5 @@
 using System.Net;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
@@ -9,6 +10,7 @@ using TVMenukaart.Models;
 
 namespace TVMenukaart.Controllers
 {
+    [Authorize]
     public class MenuItemsController : BaseApiController
     {
         private readonly TVMenukaartContext _context;
@@ -42,9 +44,6 @@ namespace TVMenukaart.Controllers
             }).ToList();
 
             return Ok(menuItemDtos);
-            // return await _context.MenuItems
-            //     // .Include(c => c.Category)
-            //     .ToListAsync();
         }
 
         [HttpGet("{id}")]
@@ -100,13 +99,6 @@ namespace TVMenukaart.Controllers
                 return BadRequest();
             }
 
-            // var category = await _context.Categories.FindAsync(menuItem.Category.Id);
-
-            // if (category == null)
-            // {
-            //     return NotFound($"Category with id {menuItem.Category.Id} is not found");
-            // }
-
             var existingMenuItem = await _context.MenuItems.FindAsync(id);
             if (existingMenuItem == null)
             {
@@ -117,18 +109,8 @@ namespace TVMenukaart.Controllers
             existingMenuItem.Price = menuItemDto.Price;
             existingMenuItem.Description = menuItemDto.Description;
 
-            try
-            {
-                await _context.SaveChangesAsync();
-                await _hubContext.Clients.All.SendAsync("ReceiveMenuUpdate");
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!MenuItemExists(id))
-                {
-                    return NotFound();
-                }
-            }
+            await _context.SaveChangesAsync();
+            await _hubContext.Clients.All.SendAsync("ReceiveMenuUpdate");
 
             return Ok();
         }

@@ -5,7 +5,7 @@ using TVMenukaart.DTO;
 using TVMenukaart.IntegrationTests.Abstractions;
 using Xunit;
 
-namespace TVMenukaart.IntegrationTests.Menu
+namespace TVMenukaart.IntegrationTests.Menus
 {
     public class GetMenusTests : BaseFunctionalTest
     {

@@ -4,7 +4,7 @@ using FluentAssertions;
 using TVMenukaart.IntegrationTests.Abstractions;
 using Xunit;
 
-namespace TVMenukaart.IntegrationTests.Menu
+namespace TVMenukaart.IntegrationTests.Menus
 {
     public class MenuBoardPhotoTests : BaseFunctionalTest
     {
