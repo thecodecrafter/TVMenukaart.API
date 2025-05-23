@@ -14,7 +14,7 @@ namespace TVMenukaart.IntegrationTests.MenuSections
         [Fact]
         public async Task Should_ReturnNotFound_WhenMenuSectionIsNotFound()
         {
-            // Arrange
+            // Arrangee
             var appUser = DataSeeder.GetTestUser();
             var client = await CreateClientWithAuth(appUser.UserName);
 
